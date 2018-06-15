@@ -1,4 +1,5 @@
 import jenkins.branch.BranchEventCause;
+import jenkins.branch.BranchIndexingCause;
 import org.jenkinsci.plugins.workflow.cps.replay.ReplayCause;
 
 pipeline {
@@ -30,6 +31,10 @@ pipeline {
                         {
                             echo "Triggered by BranchEventCause!"
                             env.BUILD_TRIGGER = "PR"
+                        }
+                        else if (cause instanceof BranchIndexingCause)
+                        {
+                            echo "Triggered by BranchIndexingCause!"
                         }
                         else if (cause instanceof ReplayCause)
                         {
