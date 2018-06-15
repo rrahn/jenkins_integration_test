@@ -3,7 +3,7 @@ pipeline {
     environment
     {
         PR_NUMBER = "${GITHUB_PR_NUMBER}"
-        BUILD_TRIGGER="none"  // [PR, CRON, TAG, USER]
+        BUILD_TRIGGER="none"   // [PR, CRON, TAG, USER]
     }
     stages
     {
@@ -11,37 +11,37 @@ pipeline {
         {
             steps
             {
-                echo 'My PR ${env.PR_NUMBER}'
+                echo "My PR ${env.PR_NUMBER}"
+
             }
         }
-    //     stage ('Prepare')
-    //     {
-    //         steps
-    //         {
-    //             script
-    //             {
-    //                 env.BUILD_TRIGGER = "cron"
-    //                 for (cause in currentBuild.rawBuild.getCauses())
-    //                 {
-    //                     if (cause instanceof GitHubPRCause)
-    //                     {
-    //                         echo "Triggered by SCM!"
-    //                         env.BUILD_TRIGGER = "PR"
-    //                     }
-    //                     else if (cause instanceof triggers.TimerTrigger.TimerTriggerCause)
-    //                     {
-    //                         echo "Triggered by cron."
-    //                         env.BUILD_TRIGGER = "CRON"
-    //                     }
-    //                     else if ()
-    //                     {
-    //
-    //                     }
-    //                     echo "to string ${cause.toString()}"
-    //                 }
-    //             }
-    //         }
-    //     }
+        stage ('Prepare')
+        {
+            steps
+            {
+                script
+                {
+                    for (cause in currentBuild.rawBuild.getCauses())
+                    {
+                        // if (cause instanceof GitHubPRCause)
+                        // {
+                        //     echo "Triggered by SCM!"
+                        //     env.BUILD_TRIGGER = "PR"
+                        // }
+                        // else if (cause instanceof triggers.TimerTrigger.TimerTriggerCause)
+                        // {
+                        //     echo "Triggered by cron."
+                        //     env.BUILD_TRIGGER = "CRON"
+                        // }
+                        // else if ()
+                        // {
+                        //
+                        // }
+                        echo "to string ${cause.toString()}"
+                    }
+                }
+            }
+        }
     //     stage ('Parallel') {
     //         parallel {
     //             stage('Build and tun unit tests on linux') {
