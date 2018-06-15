@@ -40,6 +40,7 @@ pipeline {
                         {
                             echo "Triggered by ReplayCause!"
                         }
+                        
                         // else if (cause instanceof triggers.TimerTrigger.TimerTriggerCause)
                         // {
                         //     echo "Triggered by cron."
