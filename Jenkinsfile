@@ -1,3 +1,6 @@
+import jenkins.branch.BranchEventCause;
+import org.jenkinsci.plugins.workflow.cps.replay.ReplayCause;
+
 pipeline {
     agent any
     environment
@@ -23,11 +26,15 @@ pipeline {
                 {
                     for (cause in currentBuild.rawBuild.getCauses())
                     {
-                        // if (cause instanceof GitHubPRCause)
-                        // {
-                        //     echo "Triggered by SCM!"
-                        //     env.BUILD_TRIGGER = "PR"
-                        // }
+                        if (cause instanceof BranchEventCause)
+                        {
+                            echo "Triggered by BranchEventCause!"
+                            env.BUILD_TRIGGER = "PR"
+                        }
+                        else if (cause instanceof ReplayCause)
+                        {
+                            echo "Triggered by ReplayCause!"
+                        }
                         // else if (cause instanceof triggers.TimerTrigger.TimerTriggerCause)
                         // {
                         //     echo "Triggered by cron."
