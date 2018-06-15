@@ -74,16 +74,16 @@ pipeline {
     //
     //         }
     //     }
-    // }
-    // post {
-    //     success {
-    //         setGitHubPullRequestStatus context: 'Jenkins CI Pipeline', message: 'The Jenkins CI passed', state: 'SUCCESS'
-    //     }
-    //     failure {
-    //         setGitHubPullRequestStatus context: 'Jenkins CI Pipeline', message: 'The Jenkins CI build failed', state: 'ERROR'
-    //     }
-    //     unstable {
-    //         setGitHubPullRequestStatus context: 'Jenkins CI Pipeline', message: 'The Jenkins CI tests failed', state: 'FAILURE'
-    //     }
+    }
+    post {
+        success {
+            setGitHubPullRequestStatus context: 'Jenkins CI Pipeline', message: 'The Jenkins CI passed', state: 'SUCCESS'
+        }
+        failure {
+            setGitHubPullRequestStatus context: 'Jenkins CI Pipeline', message: 'The Jenkins CI build failed', state: 'ERROR'
+        }
+        unstable {
+            setGitHubPullRequestStatus context: 'Jenkins CI Pipeline', message: 'The Jenkins CI tests failed', state: 'FAILURE'
+        }
     }
 }
