@@ -33,7 +33,7 @@ def determineCause()
 pipeline {
     agent any
     triggers {  // Additional trigger to build nightly on master.
-        cron('H/15 1 * * *')
+        cron('H 1 * * *')
     }
     environment {  // Prepare environment for build.
         PR_NUMBER = "${CHANGE_ID}"
@@ -80,7 +80,7 @@ pipeline {
             agent none
             when {
                 beforeAgent true
-                branch 'PR-5'
+                branch 'master'
                 anyOf {
                     environment name: 'BUILD_TRIGGER', value: 'cron'
                     tag "seqan-*"
