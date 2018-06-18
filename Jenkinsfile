@@ -1,109 +1,107 @@
 import hudson.triggers.TimerTrigger;
-import jenkins.branch.BranchEventCause;
-import jenkins.branch.BranchIndexingCause;
-import org.jenkinsci.plugins.workflow.cps.replay.ReplayCause;
 
-def determineCause()
+// Checks whether the current build was triggered by cron job.
+// We need this to check, whether we want to trigger a deployment
+// step for a stable nightly build.
+def isTriggeredByCron()
 {
     for (cause in currentBuild.rawBuild.getCauses())
     {
-        if (cause instanceof BranchEventCause)
-        {
-            echo "Triggered by BranchEventCause!"
-            return "branch"
-        }
-        else if (cause instanceof BranchIndexingCause)
-        {
-            echo "Triggered by BranchIndexingCause!"
-            return "pr"
-        }
-        else if (cause instanceof TimerTrigger.TimerTriggerCause)
-        {
-            echo "Triggered by cron!"
+        if (cause instanceof TimerTrigger.TimerTriggerCause)
             return "cron"
-        }
-        else
-        {
-            echo "Triggered by ReplayCause!"
-            return "other"
-        }
+
+        return "other"
     }
 }
 
+// Start the pipeline.
 pipeline {
     agent any
     triggers {  // Additional trigger to build nightly on master.
         cron('H 1 * * *')
     }
     environment {  // Prepare environment for build.
-        PR_NUMBER = "${CHANGE_ID}"
-        BUILD_TRIGGER = "${determineCause()}"
+        BUILD_BRANCH_ID = "${CHANGE_ID ?: 'master'}"
+        BUILD_TRIGGER = "${isTriggeredByCron()}"  // TODO isTriggeredByCron
     }
-    stages {
+    stages { // TODO(rrahn): Check if really needed.
         stage ('Configure') {  // Do we need this?
             steps {
                 script {
-                    echo "My PR ${env.PR_NUMBER}"
+                    echo "The pushed branch: ${BRANCH_NAME}"
                 }
             }
         }
-        stage ('Test') {
+        stage ('Test') { // Tests all tests in parallel.
             parallel {
                 stage ('unix unit') {
                     steps {
-                        echo "Perform unit tests."
+                        echo "TODO: Test unit tests, when nightly."
+                        echo "TODO: Test unit tests, when release."
+                        build job: 'pipeline_unit_tests_unix', parameters: [string(name: 'BUILD_BRANCH_ID', value: "${env.BUILD_BRANCH_ID}")], quietPeriod: 0
                     }
                 }
                 stage ('doc') {
                     steps {
-                        echo "Perform doc tests."
+                        echo "TODO: Perform doc tests."
                     }
                 }
                 stage ('memory') {
                     steps {
-                        echo "Perform memory tests."
+                        echo "TODO: Perform memory tests."
                     }
                 }
                 stage ('coverage') {
                     steps {
-                        echo "Perform coverage tests."
+                        echo "TODO: Perform coverage tests."
                     }
                 }
                 stage ('performance') {
                     steps {
-                        echo "Perform performance tests."
+                        echo "TODO: Perform performance tests."
                     }
                 }
             }
         }
-        stage ('Deploy') {
+        stage ('Deploy') { // conditional deploy step.
             agent none
-            when {
+            when { // only execute if nightly build and on 'master' branch or if seqan was tagged with a new release.
                 beforeAgent true
-                branch 'master'
                 anyOf {
-                    environment name: 'BUILD_TRIGGER', value: 'cron'
+                    allOf {
+                        branch 'master'
+                        environment name: 'BUILD_TRIGGER', value: 'cron'
+                    }
                     tag "seqan-*"
                 }
             }
-            stages {
-                stage ('package') {
+            stages { // Execute multiple stages in sequential order.
+                stage ('package nightly stable') {
+                    when {
+                        beforeAgent true
+                        branch 'master'
+                        environment name: 'BUILD_TRIGGER', value: 'cron'
+                    }
                     steps {
                         script {
-                            if (env.BUILD_TRIGGER.equalsIgnoreCase("cron"))
-                            {
-                                echo "Deploy nightly stable."
-                            }
-                            else
-                            {
-                                echo "Deploy release."
-                            }
+                            echo "TODO: deploy nightly stable."
+                        }
+                    }
+                }
+                stage ('package release') {
+                    when {
+                        beforeAgent true
+                        tag "seqan-*"
+                    }
+                    steps {
+                        script {
+                            echo "TODOL deploy release."
                         }
                     }
                 }
                 stage ('acceptance test') {
                     steps {
-                        echo "perform acceptance test"
+                        echo "TODO: perform acceptance test"
                     }
                 }
             }
