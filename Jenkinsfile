@@ -18,10 +18,10 @@ def isTriggeredByCron()
 pipeline {
     agent any
     triggers {  // Additional trigger to build nightly on master.
-        cron('H 1 * * *')
+        cron('H * * * *')
     }
     environment {  // Prepare environment for build.
-        BUILD_BRANCH_ID = "${CHANGE_ID ?: 'master'}"
+        BUILD_BRANCH_ID = "${GIT_COMMIT ?: 'master'}"
         BUILD_TRIGGER = "${isTriggeredByCron()}"  // TODO isTriggeredByCron
     }
     stages { // TODO(rrahn): Check if really needed.
@@ -29,6 +29,9 @@ pipeline {
             steps {
                 script {
                     echo "The pushed branch: ${BRANCH_NAME}"
+                    echo "The build branch: ${env.BUILD_BRANCH_ID}"
+                    echo "Git commit hash: ${env.GIT_COMMIT}"
+                    echo "Git commit branch: ${env.GIT_BRANCH}"
                 }
             }
         }
@@ -38,7 +41,7 @@ pipeline {
                     steps {
                         echo "TODO: Test unit tests, when nightly."
                         echo "TODO: Test unit tests, when release."
-                        build job: 'pipeline_unit_tests_unix', parameters: [string(name: 'BUILD_BRANCH_ID', value: "${env.BUILD_BRANCH_ID}")], quietPeriod: 0
+                        // build job: 'pipeline_unit_tests_unix', parameters: [string(name: 'BUILD_BRANCH_ID', value: "${env.BUILD_BRANCH_ID}")], quietPeriod: 0
                     }
                 }
                 stage ('doc') {
